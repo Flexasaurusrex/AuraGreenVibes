@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 
 export default function DinoGame({ autoStart = false, onReady = () => {} }) {
   const canvasRef = useRef(null);
+  const gameRef = useRef(null);
   const dinoImgRef = useRef(null);
 
   useEffect(() => {
@@ -124,6 +125,12 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
           if (obstacle.x > -30) {
             drawCactus(obstacle.x, obstacle.y);
             
+            // Award point when obstacle passes dino
+            if (!obstacle.scored && obstacle.x < 40) {
+              obstacle.scored = true;
+              score += 10;
+            }
+            
             // Check collision
             if (checkCollision({ x: 50, y: dinoY }, obstacle)) {
               gameOver = true;
@@ -135,8 +142,6 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
           return false;
         });
 
-        // Score
-        score = Math.floor(frameCount / 10);
         frameCount++;
 
         // Increase speed over time
@@ -177,7 +182,7 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
 
     // Input handling
     const handleKeyPress = (e) => {
-      if (!isActive) return;
+      if (!isActive) return; // Ignore if not active
       
       if (e.code === 'Space') {
         e.preventDefault();
@@ -218,7 +223,7 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
     onReady();
 
     return () => {
-      isActive = false;
+      isActive = false; // Mark as inactive
       window.removeEventListener('keydown', handleKeyPress);
     };
   }, [autoStart, onReady]);
