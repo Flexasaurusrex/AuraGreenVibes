@@ -132,6 +132,36 @@ export default function Portfolio() {
       isMainProject: false
     },
     {
+      id: 'minesweeper',
+      title: 'Minesweeper',
+      icon: '💣',
+      description: 'Classic Windows XP Minesweeper - clear the mines!',
+      tech: 'JavaScript • Puzzle • Strategy',
+      isMinesweeper: true,
+      position: { x: 400, y: 60 },
+      isMainProject: false
+    },
+    {
+      id: 'minesweeper',
+      title: 'Minesweeper',
+      icon: '💣',
+      description: 'Classic Windows puzzle - flag mines, clear the board!',
+      tech: 'JavaScript • Puzzle • Logic',
+      isMinesweeper: true,
+      position: { x: 400, y: 60 },
+      isMainProject: false
+    },
+    {
+      id: 'snake',
+      title: 'Snake',
+      icon: '🐍',
+      description: 'Nokia classic - eat, grow, don\'t hit yourself!',
+      tech: 'JavaScript • Arcade • Retro',
+      isSnake: true,
+      position: { x: 520, y: 60 },
+      isMainProject: false
+    },
+    {
       id: 'terminal',
       title: 'README.txt',
       icon: '📄',
@@ -604,8 +634,8 @@ Built with: Next.js + Canvas`
           position: 'absolute',
           left: `${window.windowX}px`,
           top: `${window.windowY}px`,
-          width: window.isTerminal ? '450px' : (window.isNumberMunchers || window.isOregonTrail) ? '800px' : '500px',
-          minHeight: window.isTerminal ? '300px' : (window.isNumberMunchers || window.isOregonTrail) ? '600px' : '300px',
+          width: window.isTerminal ? '450px' : (window.isNumberMunchers || window.isOregonTrail || window.isMinesweeper || window.isSnake) ? '800px' : '500px',
+          minHeight: window.isTerminal ? '300px' : (window.isNumberMunchers || window.isOregonTrail || window.isMinesweeper || window.isSnake) ? '600px' : '300px',
           background: '#FFFFFF',
           border: '3px solid #558B2F',
           boxShadow: '8px 8px 0 rgba(0,0,0,0.3)',
@@ -724,6 +754,36 @@ Built with: Next.js + Canvas`
                   background: '#000'
                 }}
                 title="Oregon Trail Game"
+              />
+            ) : window.isMinesweeper ? (
+              <iframe 
+                src="https://urluur.github.io/minesweeper-js/"
+                style={{
+                  width: '100%',
+                  height: '550px',
+                  border: 'none',
+                  background: '#C0C0C0'
+                }}
+                title="Minesweeper Game"
+              />
+                style={{
+                  width: '100%',
+                  height: '550px',
+                  border: 'none',
+                  background: '#FFF'
+                }}
+                title="Minesweeper Game"
+              />
+            ) : window.isSnake ? (
+              <iframe 
+                src="https://patorjk.github.io/JavaScript-Snake/"
+                style={{
+                  width: '100%',
+                  height: '550px',
+                  border: 'none',
+                  background: '#000'
+                }}
+                title="Snake Game"
               />
             ) : window.isTrashWindow ? (
               <div style={{ width: '100%' }}>
