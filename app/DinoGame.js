@@ -7,18 +7,18 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
   const gameRef = useRef(null);
   const dinoImgRef = useRef(null);
 
-  // Load image ONCE, outside useEffect
-  if (!dinoImgRef.current) {
-    dinoImgRef.current = new Image();
-    dinoImgRef.current.src = '/Dino.png';
-  }
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     let isActive = true;
+    
+    // Load image inside useEffect (browser only)
+    if (!dinoImgRef.current) {
+      dinoImgRef.current = new Image();
+      dinoImgRef.current.src = '/Dino.png';
+    }
     
     const dinoImg = dinoImgRef.current;
     let dinoLoaded = dinoImg.complete;
