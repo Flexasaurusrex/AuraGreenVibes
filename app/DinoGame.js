@@ -12,6 +12,14 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
 
     const ctx = canvas.getContext('2d');
     
+    // Load dino sprite
+    const dinoImg = new Image();
+    dinoImg.src = '/Dino.png';
+    let dinoLoaded = false;
+    dinoImg.onload = () => {
+      dinoLoaded = true;
+    };
+    
     // Game variables
     let gameRunning = autoStart;
     let gameOver = false;
@@ -25,33 +33,39 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
     let gameSpeed = 6;
     let frameCount = 0;
 
-    // Dino sprite (simplified green version)
+    // Dino sprite (use image if loaded, otherwise fallback)
     const drawDino = (x, y, isJumping) => {
-      ctx.fillStyle = '#8BC34A';
-      ctx.strokeStyle = '#558B2F';
-      ctx.lineWidth = 2;
-      
-      // Body
-      ctx.fillRect(x, y, 40, 40);
-      ctx.strokeRect(x, y, 40, 40);
-      
-      // Head
-      ctx.fillRect(x + 30, y - 20, 30, 25);
-      ctx.strokeRect(x + 30, y - 20, 30, 25);
-      
-      // Eye
-      ctx.fillStyle = '#1A1A1A';
-      ctx.fillRect(x + 50, y - 15, 5, 5);
-      
-      // Legs (animated)
-      ctx.fillStyle = '#8BC34A';
-      if (!isJumping) {
-        const legOffset = Math.floor(frameCount / 10) % 2 === 0 ? 0 : 5;
-        ctx.fillRect(x + 5, y + 40, 10, 15 + legOffset);
-        ctx.fillRect(x + 25, y + 40, 10, 15 - legOffset);
+      if (dinoLoaded) {
+        // Draw the actual sprite image
+        ctx.drawImage(dinoImg, x, y, 44, 47); // Chrome dino is 44x47
       } else {
-        ctx.fillRect(x + 5, y + 40, 10, 15);
-        ctx.fillRect(x + 25, y + 40, 10, 15);
+        // Fallback to green rectangles while loading
+        ctx.fillStyle = '#8BC34A';
+        ctx.strokeStyle = '#558B2F';
+        ctx.lineWidth = 2;
+        
+        // Body
+        ctx.fillRect(x, y, 40, 40);
+        ctx.strokeRect(x, y, 40, 40);
+        
+        // Head
+        ctx.fillRect(x + 30, y - 20, 30, 25);
+        ctx.strokeRect(x + 30, y - 20, 30, 25);
+        
+        // Eye
+        ctx.fillStyle = '#1A1A1A';
+        ctx.fillRect(x + 50, y - 15, 5, 5);
+        
+        // Legs (animated)
+        ctx.fillStyle = '#8BC34A';
+        if (!isJumping) {
+          const legOffset = Math.floor(frameCount / 10) % 2 === 0 ? 0 : 5;
+          ctx.fillRect(x + 5, y + 40, 10, 15 + legOffset);
+          ctx.fillRect(x + 25, y + 40, 10, 15 - legOffset);
+        } else {
+          ctx.fillRect(x + 5, y + 40, 10, 15);
+          ctx.fillRect(x + 25, y + 40, 10, 15);
+        }
       }
     };
 
