@@ -257,7 +257,10 @@ Let's build. 🦖`
         color: '#8BC34A',
         boxShadow: '0 2px 10px rgba(0,0,0,0.3)'
       }}>
-        <span>🦖 AURAGREEN</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src="/Dino.png" alt="Dino" style={{ width: '20px', height: '21px', imageRendering: 'pixelated' }} />
+          AURAGREEN
+        </span>
         <span style={{ opacity: 0.5 }}>|</span>
         <span style={{ cursor: 'pointer' }}>FILE</span>
         <span style={{ cursor: 'pointer' }}>EDIT</span>
@@ -302,7 +305,11 @@ Let's build. 🦖`
             }}
           >
             <div style={{ fontSize: '40px', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
-              {project.icon}
+              {project.icon === '🦖' ? (
+                <img src="/Dino.png" alt="Dino" style={{ width: '40px', height: '42px', imageRendering: 'pixelated' }} />
+              ) : (
+                project.icon
+              )}
             </div>
             <div style={{
               fontSize: '8px',
