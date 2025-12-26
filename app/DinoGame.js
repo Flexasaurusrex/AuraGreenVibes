@@ -11,6 +11,7 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
+    let isActive = true; // Track if this instance is active
     
     // Load dino sprite
     const dinoImg = new Image();
@@ -201,6 +202,8 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
 
     // Input handling
     const handleKeyPress = (e) => {
+      if (!isActive) return; // Ignore if not active
+      
       if (e.code === 'Space') {
         e.preventDefault();
         
@@ -240,6 +243,7 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
     onReady();
 
     return () => {
+      isActive = false; // Mark as inactive
       window.removeEventListener('keydown', handleKeyPress);
     };
   }, [autoStart, onReady]);
