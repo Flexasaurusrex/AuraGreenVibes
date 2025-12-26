@@ -8,10 +8,22 @@ export default function Portfolio() {
   const [showEnter, setShowEnter] = useState(false);
   const [entered, setEntered] = useState(false);
   const [openWindows, setOpenWindows] = useState([]);
+  const [iconPositions, setIconPositions] = useState({});
+  const [draggingIcon, setDraggingIcon] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const handleGameReady = useCallback(() => {
     setTimeout(() => setShowEnter(true), 2000);
   }, []);
+
+  // Auto-open terminal window when entering desktop
+  useEffect(() => {
+    if (entered && openWindows.length === 0) {
+      setTimeout(() => {
+        openWindow(projects.find(p => p.id === 'terminal'));
+      }, 500);
+    }
+  }, [entered]);
 
   const projects = [
     {
@@ -20,7 +32,9 @@ export default function Portfolio() {
       icon: '🔥',
       description: 'Real-time liquidation tracker for crypto traders',
       tech: 'Next.js • Chrome Extension • WebSockets',
-      links: { live: 'https://lighterpro.vercel.app', github: '#' }
+      links: { live: 'https://lighterpro.vercel.app', github: '#' },
+      position: { x: 40, y: 100 },
+      isMainProject: true
     },
     {
       id: 'feylon',
@@ -28,7 +42,9 @@ export default function Portfolio() {
       icon: '👁️',
       description: 'Web3 reward distribution system with viral mechanics',
       tech: 'React • Blockchain • Token Distribution',
-      links: { live: '#', github: '#' }
+      links: { live: '#', github: '#' },
+      position: { x: 40, y: 200 },
+      isMainProject: true
     },
     {
       id: 'seen',
@@ -36,7 +52,9 @@ export default function Portfolio() {
       icon: '🎨',
       description: 'Anti-marketplace NFT gallery - being seen is enough',
       tech: 'Next.js • NFT APIs • Web3',
-      links: { live: 'https://tobeseen.xyz', github: '#' }
+      links: { live: 'https://tobeseen.xyz', github: '#' },
+      position: { x: 40, y: 300 },
+      isMainProject: true
     },
     {
       id: 'artclaps',
@@ -44,7 +62,9 @@ export default function Portfolio() {
       icon: '👏',
       description: 'Farcaster-native artist platform',
       tech: 'Farcaster • Social Mechanics • React',
-      links: { live: '#', github: '#' }
+      links: { live: '#', github: '#' },
+      position: { x: 40, y: 400 },
+      isMainProject: true
     },
     {
       id: 'vonmesser',
@@ -52,7 +72,9 @@ export default function Portfolio() {
       icon: '🌊',
       description: 'Premium tourism websites for Albanian Riviera',
       tech: 'Next.js • E-commerce • Custom CMS',
-      links: { live: '#', github: '#' }
+      links: { live: '#', github: '#' },
+      position: { x: 40, y: 500 },
+      isMainProject: true
     },
     {
       id: 'dinogame',
@@ -60,7 +82,59 @@ export default function Portfolio() {
       icon: '🦖',
       description: 'Play the classic Chrome dino game!',
       tech: 'Canvas • JavaScript • Pure Fun',
-      isGame: true
+      isGame: true,
+      position: { x: 40, y: 600 },
+      isMainProject: true
+    },
+    {
+      id: 'terminal',
+      title: 'README.txt',
+      icon: '📄',
+      description: 'About AuraGreen Coding',
+      tech: '',
+      isTerminal: true,
+      position: { x: 300, y: 150 },
+      content: `> INITIALIZING AURAGREEN_CODING...
+> LOADING PROFILE...
+> █████████████████████ 100%
+
+HELLO WORLD! 🦖
+
+I'm Flex - a relentless builder who never stops running.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 STATS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Top 0.5% builder on Replit
+• 59 projects shipped
+• 14 live products
+• 38K+ app views
+• 12 years running profitable businesses
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💼 CURRENT WORK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Building Web3 tools & trading platforms
+• Premium web development for tourism
+• NFT ecosystem infrastructure
+• 100K+ social media reach
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 EXPERTISE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Next.js / React / Web3
+• Chrome Extensions
+• Real-time Data Systems
+• NFT Platform Development
+• E-commerce Solutions
+
+Like the Chrome dino that never stops running,
+I keep building until it works.
+
+Available for contract work.
+4-6 week MVP sprints preferred.
+
+> EOF_`
     },
     {
       id: 'about',
@@ -68,6 +142,7 @@ export default function Portfolio() {
       icon: '🦖',
       description: 'The builder behind AuraGreen',
       tech: '',
+      position: { x: 40, y: 700 },
       content: `> AURAGREEN_CODING
 
 Top 0.5% builder on Replit
@@ -90,6 +165,7 @@ Available for contract work.`
       icon: '📬',
       description: 'Let\'s build something',
       tech: '',
+      position: { x: 160, y: 700 },
       content: `> CONTACT_
 
 GitHub: github.com/yourusername
@@ -105,17 +181,83 @@ Day rate: Contact for quote
 Project-based available
 
 Let's build. 🦖`
+    },
+    {
+      id: 'trash',
+      title: 'Trash',
+      icon: '🗑️',
+      description: 'Recycle Bin',
+      isSystem: true,
+      position: { x: window.innerWidth - 150, y: window.innerHeight - 200 },
+      content: `> TRASH_
+
+Empty
+
+No items in trash.`
+    },
+    {
+      id: 'settings',
+      title: 'Settings',
+      icon: '⚙️',
+      description: 'System Preferences',
+      isSystem: true,
+      position: { x: window.innerWidth - 150, y: window.innerHeight - 350 },
+      content: `> SYSTEM_SETTINGS
+
+Display: Retro Mode ✓
+Theme: AuraGreen
+Font: Press Start 2P
+Dino Mode: Always On 🦖
+
+Version: 1.0.0
+Built with: Next.js + Canvas`
     }
   ];
 
   const openWindow = (project) => {
+    if (!project) return;
     if (!openWindows.find(w => w.id === project.id)) {
-      setOpenWindows([...openWindows, { ...project, x: Math.random() * 200, y: Math.random() * 100 }]);
+      setOpenWindows([...openWindows, { 
+        ...project, 
+        windowX: Math.random() * 200 + 100, 
+        windowY: Math.random() * 100 + 100 
+      }]);
     }
   };
 
   const closeWindow = (projectId) => {
     setOpenWindows(openWindows.filter(w => w.id !== projectId));
+  };
+
+  const handleIconMouseDown = (e, icon) => {
+    if (icon.isTerminal && openWindows.find(w => w.id === icon.id)) {
+      // Don't drag if terminal is already open
+      return;
+    }
+    
+    e.preventDefault();
+    const pos = iconPositions[icon.id] || icon.position;
+    setDraggingIcon(icon.id);
+    setDragOffset({
+      x: e.clientX - pos.x,
+      y: e.clientY - pos.y
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (draggingIcon) {
+      setIconPositions(prev => ({
+        ...prev,
+        [draggingIcon]: {
+          x: e.clientX - dragOffset.x,
+          y: e.clientY - dragOffset.y
+        }
+      }));
+    }
+  };
+
+  const handleMouseUp = () => {
+    setDraggingIcon(null);
   };
 
   if (loading && !entered) {
@@ -205,15 +347,24 @@ Let's build. 🦖`
   }
 
   return (
-    <div style={{
-      width: '100vw',
-      height: '100vh',
-      background: 'linear-gradient(180deg, #F5F5DC 0%, #E8E8D0 100%)',
-      position: 'relative',
-      overflow: 'hidden',
-      fontFamily: '"Press Start 2P", monospace',
-      cursor: 'url("data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0 L0 16 L4 12 L7 19 L9 18 L6 11 L12 11 Z\' fill=\'black\' stroke=\'white\' stroke-width=\'1\'/%3E%3C/svg%3E") 0 0, auto'
-    }}>
+    <div 
+      style={{
+        width: '100vw',
+        height: '100vh',
+        background: `
+          linear-gradient(180deg, #F5F5DC 0%, #E8E8D0 100%),
+          repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 195, 74, 0.03) 2px, rgba(139, 195, 74, 0.03) 4px)
+        `,
+        backgroundBlendMode: 'multiply',
+        position: 'relative',
+        overflow: 'hidden',
+        fontFamily: '"Press Start 2P", monospace',
+        cursor: draggingIcon ? 'grabbing' : 'default',
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
+      {/* Menu bar */}
       <div style={{
         height: '30px',
         background: '#1A1A1A',
@@ -224,7 +375,8 @@ Let's build. 🦖`
         gap: '20px',
         fontSize: '10px',
         color: '#8BC34A',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.3)'
+        boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
+        zIndex: 9999
       }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img src="/Dino.png" alt="Dino" style={{ width: '20px', height: '21px', imageRendering: 'pixelated' }} />
@@ -240,39 +392,38 @@ Let's build. 🦖`
         </span>
       </div>
 
-      <div style={{
-        padding: '40px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, 120px)',
-        gap: '30px',
-        height: 'calc(100vh - 30px)',
-        overflowY: 'auto'
-      }}>
-        {projects.map(project => (
+      {/* Desktop icons */}
+      {projects.map(project => {
+        const pos = iconPositions[project.id] || project.position;
+        return (
           <div
             key={project.id}
-            onClick={() => openWindow(project)}
+            onMouseDown={(e) => handleIconMouseDown(e, project)}
+            onClick={() => !draggingIcon && openWindow(project)}
             style={{
+              position: 'absolute',
+              left: `${pos.x}px`,
+              top: `${pos.y}px`,
               width: '100px',
-              height: '100px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
+              cursor: draggingIcon === project.id ? 'grabbing' : 'grab',
+              transition: draggingIcon === project.id ? 'none' : 'all 0.2s',
               padding: '10px',
               borderRadius: '8px',
+              userSelect: 'none'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(139, 195, 74, 0.2)';
+              if (!draggingIcon) e.currentTarget.style.background = 'rgba(139, 195, 74, 0.2)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'transparent';
             }}
           >
-            <div style={{ fontSize: '40px', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
+            <div style={{ fontSize: '40px', textShadow: '2px 2px 4px rgba(0,0,0,0.3)', pointerEvents: 'none' }}>
               {project.icon === '🦖' ? (
                 <img src="/Dino.png" alt="Dino" style={{ width: '40px', height: '42px', imageRendering: 'pixelated' }} />
               ) : (
@@ -284,25 +435,27 @@ Let's build. 🦖`
               color: '#1A1A1A',
               textAlign: 'center',
               lineHeight: '12px',
-              textShadow: '1px 1px 2px rgba(255,255,255,0.8)'
+              textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
+              pointerEvents: 'none'
             }}>
               {project.title}
             </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
 
-      {openWindows.map(window => (
+      {/* Windows */}
+      {openWindows.map((window, index) => (
         <div key={window.id} style={{
           position: 'absolute',
-          left: `${100 + window.x}px`,
-          top: `${100 + window.y}px`,
-          width: '500px',
-          minHeight: '300px',
+          left: `${window.windowX}px`,
+          top: `${window.windowY}px`,
+          width: window.isTerminal ? '600px' : '500px',
+          minHeight: window.isTerminal ? '400px' : '300px',
           background: '#FFFFFF',
           border: '3px solid #558B2F',
           boxShadow: '8px 8px 0 rgba(0,0,0,0.3)',
-          zIndex: 1000
+          zIndex: 1000 + index
         }}>
           <div style={{
             height: '35px',
@@ -345,7 +498,9 @@ Let's build. 🦖`
             fontSize: '10px',
             lineHeight: '18px',
             fontFamily: '"Courier New", monospace',
-            minHeight: '250px',
+            minHeight: window.isTerminal ? '350px' : '250px',
+            maxHeight: '500px',
+            overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
             alignItems: window.isGame ? 'center' : 'flex-start',
@@ -353,8 +508,8 @@ Let's build. 🦖`
           }}>
             {window.isGame ? (
               <DinoGame autoStart={false} />
-            ) : window.content ? (
-              <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{window.content}</pre>
+            ) : window.content || window.isTerminal ? (
+              <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#8BC34A' }}>{window.content}</pre>
             ) : (
               <>
                 <div style={{ marginBottom: '15px', color: '#8BC34A' }}>
@@ -411,6 +566,63 @@ Let's build. 🦖`
           </div>
         </div>
       ))}
+
+      {/* Bottom Dock */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '60px',
+        background: 'rgba(26, 26, 26, 0.95)',
+        borderTop: '2px solid #8BC34A',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '15px',
+        padding: '0 20px',
+        boxShadow: '0 -2px 20px rgba(0,0,0,0.5)',
+        zIndex: 9998
+      }}>
+        {projects.filter(p => p.isMainProject).map(project => (
+          <div
+            key={project.id}
+            onClick={() => openWindow(project)}
+            style={{
+              width: '45px',
+              height: '45px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '30px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              borderRadius: '8px',
+              background: openWindows.find(w => w.id === project.id) ? 'rgba(139, 195, 74, 0.3)' : 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px) scale(1.1)';
+              e.currentTarget.style.background = 'rgba(139, 195, 74, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.background = openWindows.find(w => w.id === project.id) ? 'rgba(139, 195, 74, 0.3)' : 'transparent';
+            }}
+          >
+            {project.icon}
+          </div>
+        ))}
+        
+        <div style={{ flex: 1 }} />
+        
+        <div style={{
+          fontSize: '10px',
+          color: '#8BC34A',
+          letterSpacing: '2px'
+        }}>
+          {new Date().toLocaleTimeString()}
+        </div>
+      </div>
     </div>
   );
 }
