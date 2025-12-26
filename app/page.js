@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Draggable from 'react-draggable';
+import DinoGame from './DinoGame';
 
 export default function Portfolio() {
   const [loading, setLoading] = useState(true);
@@ -89,6 +89,14 @@ export default function Portfolio() {
       links: { live: '#', github: '#' }
     },
     {
+      id: 'dinogame',
+      title: 'Dino Game',
+      icon: '🦖',
+      description: 'Play the classic Chrome dino game!',
+      tech: 'Canvas • JavaScript • Pure Fun',
+      isGame: true
+    },
+    {
       id: 'about',
       title: 'About Me',
       icon: '🦖',
@@ -155,61 +163,35 @@ Let's build. 🦖`
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: '"Press Start 2P", monospace',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        gap: '40px'
       }}>
-        {/* Animated Dino */}
-        <motion.div
-          animate={{
-            y: dinoJump ? -50 : 0,
-          }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-          style={{
-            fontSize: '80px',
-            marginBottom: '40px',
-            filter: 'drop-shadow(0 0 20px #8BC34A)'
-          }}
-        >
-          🦖
-        </motion.div>
-
-        {/* Running animation */}
+        {/* Title */}
         <div style={{
-          fontSize: '14px',
+          fontSize: '24px',
           color: '#8BC34A',
-          marginBottom: '20px',
-          letterSpacing: '2px'
+          textShadow: '0 0 20px rgba(139, 195, 74, 0.5)',
+          letterSpacing: '3px',
+          marginBottom: '-20px'
         }}>
-          {dinoJump ? '▲ ▲ ▲' : '▶ ▶ ▶'}
+          AURAGREEN CODING
         </div>
 
-        {/* Loading bar */}
-        <div style={{
-          width: '400px',
-          height: '30px',
-          border: '3px solid #8BC34A',
-          background: '#1A1A1A',
-          position: 'relative',
-          boxShadow: '0 0 20px rgba(139, 195, 74, 0.3)'
-        }}>
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            style={{
-              height: '100%',
-              background: 'linear-gradient(90deg, #558B2F, #8BC34A)',
-              boxShadow: 'inset 0 0 10px rgba(255,255,255,0.3)'
-            }}
-          />
-        </div>
+        {/* Playable Dino Game */}
+        <DinoGame autoStart={true} onReady={() => {
+          setTimeout(() => setShowEnter(true), 2000);
+        }} />
 
-        {/* Progress text */}
+        {/* Instructions */}
         <div style={{
-          marginTop: '20px',
-          fontSize: '12px',
-          color: '#8BC34A',
-          letterSpacing: '2px'
+          fontSize: '10px',
+          color: '#558B2F',
+          letterSpacing: '2px',
+          textAlign: 'center',
+          marginTop: '-20px'
         }}>
-          LOADING... {progress}%
+          PRESS SPACE TO JUMP<br/>
+          🦖 NEVER STOPS RUNNING 🦖
         </div>
 
         {/* Enter button */}
@@ -354,13 +336,10 @@ Let's build. 🦖`
 
       {/* Windows */}
       {openWindows.map(window => (
-        <Draggable
-          key={window.id}
-          defaultPosition={{ x: 100 + window.x, y: 100 + window.y }}
-          handle=".window-header"
-        >
-          <div style={{
+          <div key={window.id} style={{
             position: 'absolute',
+            left: `${100 + window.x}px`,
+            top: `${100 + window.y}px`,
             width: '500px',
             minHeight: '300px',
             background: '#FFFFFF',
@@ -378,7 +357,7 @@ Let's build. 🦖`
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '0 10px',
-                cursor: 'move',
+                cursor: 'default',
                 borderBottom: '2px solid #558B2F'
               }}
             >
@@ -416,9 +395,15 @@ Let's build. 🦖`
               fontSize: '10px',
               lineHeight: '18px',
               fontFamily: '"Courier New", monospace',
-              minHeight: '250px'
+              minHeight: '250px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: window.isGame ? 'center' : 'flex-start',
+              justifyContent: window.isGame ? 'center' : 'flex-start'
             }}>
-              {window.content ? (
+              {window.isGame ? (
+                <DinoGame autoStart={false} />
+              ) : window.content ? (
                 <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{window.content}</pre>
               ) : (
                 <>
@@ -475,7 +460,6 @@ Let's build. 🦖`
               )}
             </div>
           </div>
-        </Draggable>
       ))}
     </div>
   );
