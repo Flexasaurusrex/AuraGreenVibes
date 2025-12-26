@@ -5,21 +5,23 @@ import { useEffect, useRef } from 'react';
 export default function DinoGame({ autoStart = false, onReady = () => {} }) {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
+  const dinoImgRef = useRef(null);
+
+  // Load image ONCE, outside useEffect
+  if (!dinoImgRef.current) {
+    dinoImgRef.current = new Image();
+    dinoImgRef.current.src = '/Dino.png';
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    let isActive = true; // Track if this instance is active
+    let isActive = true;
     
-    // Load dino sprite
-    const dinoImg = new Image();
-    dinoImg.src = '/Dino.png';
-    let dinoLoaded = false;
-    dinoImg.onload = () => {
-      dinoLoaded = true;
-    };
+    const dinoImg = dinoImgRef.current;
+    let dinoLoaded = dinoImg.complete;
     
     // Game variables
     let gameRunning = autoStart;
