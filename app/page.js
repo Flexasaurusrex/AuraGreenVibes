@@ -188,7 +188,7 @@ Let's build. 🦖`
       icon: '🗑️',
       description: 'Recycle Bin',
       isSystem: true,
-      position: { x: window.innerWidth - 150, y: window.innerHeight - 200 },
+      position: { x: 1200, y: 600 },
       content: `> TRASH_
 
 Empty
@@ -201,7 +201,7 @@ No items in trash.`
       icon: '⚙️',
       description: 'System Preferences',
       isSystem: true,
-      position: { x: window.innerWidth - 150, y: window.innerHeight - 350 },
+      position: { x: 1200, y: 450 },
       content: `> SYSTEM_SETTINGS
 
 Display: Retro Mode ✓
