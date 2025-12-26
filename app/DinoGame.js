@@ -100,13 +100,26 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
       }
     };
 
-    // Collision detection
-    const checkCollision = (dino, obstacle) => {
+    // Collision detection (dino is 44x47, positioned at x=50)
+    const checkCollision = (obstacle) => {
+      const dinoLeft = 50;
+      const dinoRight = 50 + 44;
+      const dinoTop = dinoY;
+      const dinoBottom = dinoY + 47;
+      
+      const obstacleLeft = obstacle.x;
+      const obstacleRight = obstacle.x + 20;
+      const obstacleTop = obstacle.y;
+      const obstacleBottom = obstacle.y + 50;
+      
+      // Add some tolerance for more forgiving collision
+      const tolerance = 5;
+      
       return (
-        50 < obstacle.x + 20 &&
-        50 + 40 > obstacle.x &&
-        dinoY < obstacle.y + 50 &&
-        dinoY + 40 > obstacle.y
+        dinoRight - tolerance > obstacleLeft &&
+        dinoLeft + tolerance < obstacleRight &&
+        dinoBottom - tolerance > obstacleTop &&
+        dinoTop + tolerance < obstacleBottom
       );
     };
 
@@ -148,8 +161,14 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
           if (obstacle.x > -30) {
             drawCactus(obstacle.x, obstacle.y);
             
+            // Award point when obstacle passes dino
+            if (!obstacle.scored && obstacle.x < 50) {
+              obstacle.scored = true;
+              score += 10;
+            }
+            
             // Check collision
-            if (checkCollision({ x: 50, y: dinoY }, obstacle)) {
+            if (checkCollision(obstacle)) {
               gameOver = true;
               if (score > highScore) highScore = score;
             }
@@ -159,8 +178,6 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
           return false;
         });
 
-        // Score
-        score = Math.floor(frameCount / 10);
         frameCount++;
 
         // Increase speed over time
