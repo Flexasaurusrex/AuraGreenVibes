@@ -8,6 +8,7 @@ export default function Portfolio() {
   const [showEnter, setShowEnter] = useState(false);
   const [entered, setEntered] = useState(false);
   const [openWindows, setOpenWindows] = useState([]);
+  const [minimizedWindows, setMinimizedWindows] = useState([]);
   const [iconPositions, setIconPositions] = useState({});
   const [draggingIcon, setDraggingIcon] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -246,21 +247,48 @@ Built with: Next.js + Canvas`
 
   const openWindow = (project) => {
     if (!project) return;
-    if (!openWindows.find(w => w.id === project.id)) {
-      // Center terminal window, random position for others
-      const windowX = project.isTerminal ? (window.innerWidth - 450) / 2 : Math.random() * 200 + 100;
-      const windowY = project.isTerminal ? (window.innerHeight - 350) / 2 : Math.random() * 100 + 100;
-      
-      setOpenWindows([...openWindows, { 
-        ...project, 
-        windowX, 
-        windowY 
-      }]);
+    
+    // Check if it's minimized - unminimize instead
+    const minimized = minimizedWindows.find(w => w.id === project.id);
+    if (minimized) {
+      unminimizeWindow(project.id);
+      return;
     }
+    
+    // Don't open if already open
+    if (openWindows.find(w => w.id === project.id)) {
+      return;
+    }
+    
+    // Center terminal window, random position for others
+    const windowX = project.isTerminal ? (window.innerWidth - 450) / 2 : Math.random() * 200 + 100;
+    const windowY = project.isTerminal ? (window.innerHeight - 350) / 2 : Math.random() * 100 + 100;
+    
+    setOpenWindows([...openWindows, { 
+      ...project, 
+      windowX, 
+      windowY 
+    }]);
   };
 
   const closeWindow = (projectId) => {
     setOpenWindows(openWindows.filter(w => w.id !== projectId));
+  };
+
+  const minimizeWindow = (projectId) => {
+    const window = openWindows.find(w => w.id === projectId);
+    if (window) {
+      setMinimizedWindows([...minimizedWindows, window]);
+      setOpenWindows(openWindows.filter(w => w.id !== projectId));
+    }
+  };
+
+  const unminimizeWindow = (projectId) => {
+    const window = minimizedWindows.find(w => w.id === projectId);
+    if (window) {
+      setOpenWindows([...openWindows, window]);
+      setMinimizedWindows(minimizedWindows.filter(w => w.id !== projectId));
+    }
   };
 
   const handleIconMouseDown = (e, icon) => {
@@ -558,8 +586,27 @@ Built with: Next.js + Canvas`
           background: '#FFFFFF',
           border: '3px solid #558B2F',
           boxShadow: '8px 8px 0 rgba(0,0,0,0.3)',
-          zIndex: 1000 + index
+          zIndex: 1000 + index,
+          animation: 'bounceIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
         }}>
+          <style>{`
+            @keyframes bounceIn {
+              0% {
+                transform: scale(0.3);
+                opacity: 0;
+              }
+              50% {
+                transform: scale(1.05);
+              }
+              70% {
+                transform: scale(0.9);
+              }
+              100% {
+                transform: scale(1);
+                opacity: 1;
+              }
+            }
+          `}</style>
           <div style={{
             height: '35px',
             background: 'linear-gradient(180deg, #8BC34A 0%, #558B2F 100%)',
@@ -574,24 +621,46 @@ Built with: Next.js + Canvas`
               <span>{window.icon}</span>
               <span>{window.title}</span>
             </div>
-            <button
-              onClick={() => closeWindow(window.id)}
-              style={{
-                width: '20px',
-                height: '20px',
-                background: '#FF5252',
-                border: '2px solid #C62828',
-                cursor: 'pointer',
-                fontSize: '10px',
-                color: '#FFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 'bold'
-              }}
-            >
-              ×
-            </button>
+            <div style={{ display: 'flex', gap: '5px' }}>
+              <button
+                onClick={() => minimizeWindow(window.id)}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  background: '#FFD700',
+                  border: '2px solid #FFA500',
+                  cursor: 'pointer',
+                  fontSize: '10px',
+                  color: '#1A1A1A',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold'
+                }}
+                title="Minimize"
+              >
+                −
+              </button>
+              <button
+                onClick={() => closeWindow(window.id)}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  background: '#FF5252',
+                  border: '2px solid #C62828',
+                  cursor: 'pointer',
+                  fontSize: '10px',
+                  color: '#FFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold'
+                }}
+                title="Close"
+              >
+                ×
+              </button>
+            </div>
           </div>
 
           <div style={{
@@ -769,10 +838,14 @@ Built with: Next.js + Canvas`
         boxShadow: '0 -2px 20px rgba(0,0,0,0.5)',
         zIndex: 9998
       }}>
-        {projects.filter(p => p.isMainProject).map(project => (
+        {projects.filter(p => p.isMainProject).map(project => {
+          const isOpen = openWindows.find(w => w.id === project.id);
+          const isMinimized = minimizedWindows.find(w => w.id === project.id);
+          
+          return (
           <div
             key={project.id}
-            onClick={() => openWindow(project)}
+            onClick={() => isMinimized ? unminimizeWindow(project.id) : openWindow(project)}
             style={{
               width: '45px',
               height: '45px',
@@ -783,7 +856,9 @@ Built with: Next.js + Canvas`
               cursor: 'pointer',
               transition: 'all 0.2s',
               borderRadius: '8px',
-              background: openWindows.find(w => w.id === project.id) ? 'rgba(139, 195, 74, 0.3)' : 'transparent'
+              background: isOpen ? 'rgba(139, 195, 74, 0.3)' : isMinimized ? 'rgba(255, 215, 0, 0.3)' : 'transparent',
+              border: isMinimized ? '2px solid #FFD700' : '2px solid transparent',
+              boxShadow: isMinimized ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-5px) scale(1.1)';
@@ -791,12 +866,13 @@ Built with: Next.js + Canvas`
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0) scale(1)';
-              e.currentTarget.style.background = openWindows.find(w => w.id === project.id) ? 'rgba(139, 195, 74, 0.3)' : 'transparent';
+              e.currentTarget.style.background = isOpen ? 'rgba(139, 195, 74, 0.3)' : isMinimized ? 'rgba(255, 215, 0, 0.3)' : 'transparent';
             }}
           >
             {project.icon}
           </div>
-        ))}
+          );
+        })}
         
         <div style={{ flex: 1 }} />
         
