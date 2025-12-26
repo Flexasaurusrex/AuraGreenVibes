@@ -41,9 +41,11 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
     let gameSpeed = 6;
     let frameCount = 0;
 
-    // Dino sprite - just draw it
+    // Dino sprite - only draw if loaded
     const drawDino = (x, y, isJumping) => {
-      ctx.drawImage(dinoImg, x, y, 44, 47);
+      if (dinoImg.complete && dinoImg.naturalWidth > 0) {
+        ctx.drawImage(dinoImg, x, y, 44, 47);
+      }
     };
 
     // Cactus obstacle (green theme)
