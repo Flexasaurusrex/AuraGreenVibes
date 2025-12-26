@@ -122,6 +122,16 @@ export default function Portfolio() {
       isMainProject: false
     },
     {
+      id: 'oregontrail',
+      title: 'Oregon Trail',
+      icon: '🐂',
+      description: 'The legendary pioneer journey - hunt, rest, survive!',
+      tech: 'JavaScript • Educational • Survival',
+      isOregonTrail: true,
+      position: { x: 280, y: 60 },
+      isMainProject: false
+    },
+    {
       id: 'terminal',
       title: 'README.txt',
       icon: '📄',
@@ -594,8 +604,8 @@ Built with: Next.js + Canvas`
           position: 'absolute',
           left: `${window.windowX}px`,
           top: `${window.windowY}px`,
-          width: window.isTerminal ? '450px' : window.isNumberMunchers ? '600px' : '500px',
-          minHeight: window.isTerminal ? '300px' : window.isNumberMunchers ? '500px' : '300px',
+          width: window.isTerminal ? '450px' : (window.isNumberMunchers || window.isOregonTrail) ? '600px' : '500px',
+          minHeight: window.isTerminal ? '300px' : (window.isNumberMunchers || window.isOregonTrail) ? '500px' : '300px',
           background: '#FFFFFF',
           border: '3px solid #558B2F',
           boxShadow: '8px 8px 0 rgba(0,0,0,0.3)',
@@ -703,6 +713,17 @@ Built with: Next.js + Canvas`
                   background: '#000'
                 }}
                 title="Number Munchers Game"
+              />
+            ) : window.isOregonTrail ? (
+              <iframe 
+                src="https://warnock.github.io/oregon-trail-game/"
+                style={{
+                  width: '100%',
+                  height: '450px',
+                  border: 'none',
+                  background: '#000'
+                }}
+                title="Oregon Trail Game"
               />
             ) : window.isTrashWindow ? (
               <div style={{ width: '100%' }}>
