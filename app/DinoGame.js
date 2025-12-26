@@ -21,7 +21,16 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
     }
     
     const dinoImg = dinoImgRef.current;
-    let dinoLoaded = dinoImg.complete;
+    
+    // Check if loaded and set up load handler
+    if (dinoImg.complete && dinoImg.naturalWidth > 0) {
+      // Already loaded
+    } else {
+      // Wait for load
+      dinoImg.onload = () => {
+        // Image loaded, will be used on next frame
+      };
+    }
     
     // Game variables
     let gameRunning = autoStart;
@@ -36,40 +45,9 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
     let gameSpeed = 6;
     let frameCount = 0;
 
-    // Dino sprite - ONLY CHANGE: use image instead of rectangles
+    // Dino sprite - just draw it
     const drawDino = (x, y, isJumping) => {
-      if (dinoLoaded) {
-        // Draw the actual sprite image (44x47)
-        ctx.drawImage(dinoImg, x, y, 44, 47);
-      } else {
-        // Fallback to green rectangles while loading
-        ctx.fillStyle = '#8BC34A';
-        ctx.strokeStyle = '#558B2F';
-        ctx.lineWidth = 2;
-        
-        // Body
-        ctx.fillRect(x, y, 40, 40);
-        ctx.strokeRect(x, y, 40, 40);
-        
-        // Head
-        ctx.fillRect(x + 30, y - 20, 30, 25);
-        ctx.strokeRect(x + 30, y - 20, 30, 25);
-        
-        // Eye
-        ctx.fillStyle = '#1A1A1A';
-        ctx.fillRect(x + 50, y - 15, 5, 5);
-        
-        // Legs (animated)
-        ctx.fillStyle = '#8BC34A';
-        if (!isJumping) {
-          const legOffset = Math.floor(frameCount / 10) % 2 === 0 ? 0 : 5;
-          ctx.fillRect(x + 5, y + 40, 10, 15 + legOffset);
-          ctx.fillRect(x + 25, y + 40, 10, 15 - legOffset);
-        } else {
-          ctx.fillRect(x + 5, y + 40, 10, 15);
-          ctx.fillRect(x + 25, y + 40, 10, 15);
-        }
-      }
+      ctx.drawImage(dinoImg, x, y, 44, 47);
     };
 
     // Cactus obstacle (green theme)
