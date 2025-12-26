@@ -33,11 +33,11 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
     let gameSpeed = 6;
     let frameCount = 0;
 
-    // Dino sprite (use image if loaded, otherwise fallback)
+    // Dino sprite - ONLY CHANGE: use image instead of rectangles
     const drawDino = (x, y, isJumping) => {
       if (dinoLoaded) {
-        // Draw the actual sprite image
-        ctx.drawImage(dinoImg, x, y, 44, 47); // Chrome dino is 44x47
+        // Draw the actual sprite image (44x47)
+        ctx.drawImage(dinoImg, x, y, 44, 47);
       } else {
         // Fallback to green rectangles while loading
         ctx.fillStyle = '#8BC34A';
@@ -100,26 +100,13 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
       }
     };
 
-    // Collision detection - simpler and more reliable
-    const checkCollision = (obstacle) => {
-      // Dino hitbox (slightly smaller for forgiveness)
-      const dinoX = 50 + 5; // Add padding
-      const dinoWidth = 44 - 10;
-      const dinoHeight = 47 - 10;
-      const dinoY_adjusted = dinoY + 5;
-      
-      // Cactus hitbox  
-      const cactusX = obstacle.x + 3;
-      const cactusWidth = 20 - 6;
-      const cactusY = obstacle.y + 5;
-      const cactusHeight = 50 - 5;
-      
-      // AABB collision
+    // Collision detection
+    const checkCollision = (dino, obstacle) => {
       return (
-        dinoX < cactusX + cactusWidth &&
-        dinoX + dinoWidth > cactusX &&
-        dinoY_adjusted < cactusY + cactusHeight &&
-        dinoY_adjusted + dinoHeight > cactusY
+        50 < obstacle.x + 20 &&
+        50 + 40 > obstacle.x &&
+        dinoY < obstacle.y + 50 &&
+        dinoY + 40 > obstacle.y
       );
     };
 
@@ -161,14 +148,8 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
           if (obstacle.x > -30) {
             drawCactus(obstacle.x, obstacle.y);
             
-            // Award point when obstacle passes dino
-            if (!obstacle.scored && obstacle.x < 50) {
-              obstacle.scored = true;
-              score += 10;
-            }
-            
             // Check collision
-            if (checkCollision(obstacle)) {
+            if (checkCollision({ x: 50, y: dinoY }, obstacle)) {
               gameOver = true;
               if (score > highScore) highScore = score;
             }
@@ -178,6 +159,8 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
           return false;
         });
 
+        // Score
+        score = Math.floor(frameCount / 10);
         frameCount++;
 
         // Increase speed over time
@@ -186,15 +169,8 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
         }
 
       } else {
-        // Draw static dino and frozen obstacles when not running
+        // Draw static dino
         drawDino(50, 150, false);
-        
-        // Draw existing obstacles in their frozen positions
-        obstacles.forEach(obstacle => {
-          if (obstacle.x > -30) {
-            drawCactus(obstacle.x, obstacle.y);
-          }
-        });
       }
 
       // Draw score
