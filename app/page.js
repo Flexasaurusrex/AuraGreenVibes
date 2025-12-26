@@ -36,7 +36,7 @@ export default function Portfolio() {
       description: 'Real-time liquidation tracker for crypto traders',
       tech: 'Next.js • Chrome Extension • WebSockets',
       links: { live: 'https://lighterpro.vercel.app', github: '#' },
-      position: { x: 40, y: 100 },
+      position: { x: 40, y: 60 },
       isMainProject: true
     },
     {
@@ -46,7 +46,7 @@ export default function Portfolio() {
       description: 'Web3 reward distribution system with viral mechanics',
       tech: 'React • Blockchain • Token Distribution',
       links: { live: '#', github: '#' },
-      position: { x: 40, y: 200 },
+      position: { x: 40, y: 160 },
       isMainProject: true
     },
     {
@@ -56,7 +56,7 @@ export default function Portfolio() {
       description: 'Anti-marketplace NFT gallery - being seen is enough',
       tech: 'Next.js • NFT APIs • Web3',
       links: { live: 'https://tobeseen.xyz', github: '#' },
-      position: { x: 40, y: 300 },
+      position: { x: 40, y: 260 },
       isMainProject: true
     },
     {
@@ -66,7 +66,7 @@ export default function Portfolio() {
       description: 'Farcaster-native artist platform',
       tech: 'Farcaster • Social Mechanics • React',
       links: { live: '#', github: '#' },
-      position: { x: 40, y: 400 },
+      position: { x: 40, y: 360 },
       isMainProject: true
     },
     {
@@ -76,7 +76,7 @@ export default function Portfolio() {
       description: 'Premium tourism websites for Albanian Riviera',
       tech: 'Next.js • E-commerce • Custom CMS',
       links: { live: '#', github: '#' },
-      position: { x: 40, y: 500 },
+      position: { x: 40, y: 460 },
       isMainProject: true
     },
     {
@@ -86,7 +86,7 @@ export default function Portfolio() {
       description: 'Play the classic Chrome dino game!',
       tech: 'Canvas • JavaScript • Pure Fun',
       isGame: true,
-      position: { x: 40, y: 600 },
+      position: { x: 40, y: 560 },
       isMainProject: true
     },
     {
@@ -145,7 +145,7 @@ Available for contract work.
       icon: '👤',
       description: 'The builder behind AuraGreen',
       tech: '',
-      position: { x: 40, y: 700 },
+      position: { x: 40, y: 660 },
       content: `> AURAGREEN_CODING
 
 Top 0.5% builder on Replit
