@@ -14,20 +14,27 @@ export default function Portfolio() {
 
   // Loading animation
   useEffect(() => {
-    if (loading && progress < 100) {
-      const timer = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(timer);
-            setTimeout(() => setShowEnter(true), 500);
-            return 100;
-          }
-          return prev + 2;
-        });
-      }, 50);
-      return () => clearInterval(timer);
+    const timer = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 50);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Show Enter button after loading completes
+  useEffect(() => {
+    if (progress >= 100) {
+      setTimeout(() => {
+        setShowEnter(true);
+        setLoading(false);
+      }, 500);
     }
-  }, [loading, progress]);
+  }, [progress]);
 
   // Dino jump animation
   useEffect(() => {
