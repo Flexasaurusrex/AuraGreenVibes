@@ -207,6 +207,15 @@ Project-based available
 Let's build. 🦖`
     },
     {
+      id: 'trash',
+      title: 'Trash',
+      icon: '🗑️',
+      description: 'Recycle Bin',
+      isSystem: true,
+      isTrash: true,
+      position: { x: 1200, y: 650 }
+    },
+    {
       id: 'settings',
       title: 'Settings',
       icon: '⚙️',
@@ -266,21 +275,35 @@ Built with: Next.js + Canvas`
         }
       }));
       
-      // Check if hovering over trash
-      const isOverTrash = e.clientY > window.innerHeight - 60 && e.clientX > window.innerWidth - 150;
+      // Check if hovering over desktop trash icon
+      const trashProject = projects.find(p => p.isTrash);
+      const trashPos = iconPositions['trash'] || trashProject.position;
+      const distanceToTrash = Math.sqrt(
+        Math.pow(e.clientX - (trashPos.x + 50), 2) + 
+        Math.pow(e.clientY - (trashPos.y + 50), 2)
+      );
+      const isOverTrash = distanceToTrash < 80;
       setIsTrashHovered(isOverTrash);
     }
   };
 
   const handleMouseUp = (e) => {
     if (draggingIcon && hasDragged) {
-      // Check if dropped on trash (dock is 60px high, trash is on right side)
-      const isOverTrash = e.clientY > window.innerHeight - 60 && e.clientX > window.innerWidth - 150;
+      // Get trash icon position
+      const trashProject = projects.find(p => p.isTrash);
+      const trashPos = iconPositions['trash'] || trashProject.position;
+      
+      // Check if dropped on desktop trash icon (100px radius around trash)
+      const distanceToTrash = Math.sqrt(
+        Math.pow(e.clientX - (trashPos.x + 50), 2) + 
+        Math.pow(e.clientY - (trashPos.y + 50), 2)
+      );
+      const isOverTrash = distanceToTrash < 80;
       
       if (isOverTrash) {
         // Get the project being trashed
         const project = projects.find(p => p.id === draggingIcon);
-        if (project && !project.isSystem) {
+        if (project && !project.isSystem && draggingIcon !== 'trash') {
           // Add to trash
           setTrashedItems([...trashedItems, project]);
           // Play sound
@@ -449,6 +472,9 @@ Built with: Next.js + Canvas`
       {/* Desktop icons */}
       {projects.filter(p => !trashedItems.find(t => t.id === p.id)).map(project => {
         const pos = iconPositions[project.id] || project.position;
+        const isTrashIcon = project.isTrash;
+        const isBeingDraggedOver = isTrashIcon && isTrashHovered && draggingIcon && draggingIcon !== 'trash';
+        
         return (
           <div
             key={project.id}
@@ -468,13 +494,16 @@ Built with: Next.js + Canvas`
               transition: draggingIcon === project.id ? 'none' : 'all 0.2s',
               padding: '10px',
               borderRadius: '8px',
-              userSelect: 'none'
+              userSelect: 'none',
+              border: isBeingDraggedOver ? '3px dashed #FF5252' : '3px solid transparent',
+              background: isBeingDraggedOver ? 'rgba(255, 82, 82, 0.2)' : 'transparent',
+              transform: isBeingDraggedOver ? 'scale(1.2)' : 'scale(1)'
             }}
             onMouseEnter={(e) => {
               if (!draggingIcon) e.currentTarget.style.background = 'rgba(139, 195, 74, 0.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
+              if (!isBeingDraggedOver) e.currentTarget.style.background = 'transparent';
             }}
           >
             <div style={{ fontSize: '40px', textShadow: '2px 2px 4px rgba(0,0,0,0.3)', pointerEvents: 'none' }}>
@@ -723,7 +752,7 @@ Built with: Next.js + Canvas`
         
         <div style={{ flex: 1 }} />
         
-        {/* Trash Can */}
+        {/* Trash Can - Just opens window, not a drop zone */}
         <div
           onClick={() => openWindow({ 
             id: 'trash-window',
@@ -741,16 +770,15 @@ Built with: Next.js + Canvas`
             cursor: 'pointer',
             transition: 'all 0.2s',
             borderRadius: '8px',
-            background: isTrashHovered ? 'rgba(255, 82, 82, 0.3)' : trashedItems.length > 0 ? 'rgba(139, 195, 74, 0.2)' : 'transparent',
-            border: isTrashHovered ? '2px dashed #FF5252' : '2px solid transparent'
+            background: trashedItems.length > 0 ? 'rgba(139, 195, 74, 0.2)' : 'transparent'
           }}
           onMouseEnter={(e) => {
-            if (!draggingIcon) {
-              e.currentTarget.style.transform = 'translateY(-5px) scale(1.1)';
-            }
+            e.currentTarget.style.transform = 'translateY(-5px) scale(1.1)';
+            e.currentTarget.style.background = 'rgba(139, 195, 74, 0.3)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            e.currentTarget.style.background = trashedItems.length > 0 ? 'rgba(139, 195, 74, 0.2)' : 'transparent';
           }}
         >
           🗑️
