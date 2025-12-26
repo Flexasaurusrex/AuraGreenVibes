@@ -100,26 +100,26 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
       }
     };
 
-    // Collision detection (dino is 44x47, positioned at x=50)
+    // Collision detection - simpler and more reliable
     const checkCollision = (obstacle) => {
-      const dinoLeft = 50;
-      const dinoRight = 50 + 44;
-      const dinoTop = dinoY;
-      const dinoBottom = dinoY + 47;
+      // Dino hitbox (slightly smaller for forgiveness)
+      const dinoX = 50 + 5; // Add padding
+      const dinoWidth = 44 - 10;
+      const dinoHeight = 47 - 10;
+      const dinoY_adjusted = dinoY + 5;
       
-      const obstacleLeft = obstacle.x;
-      const obstacleRight = obstacle.x + 20;
-      const obstacleTop = obstacle.y;
-      const obstacleBottom = obstacle.y + 50;
+      // Cactus hitbox  
+      const cactusX = obstacle.x + 3;
+      const cactusWidth = 20 - 6;
+      const cactusY = obstacle.y + 5;
+      const cactusHeight = 50 - 5;
       
-      // Add some tolerance for more forgiving collision
-      const tolerance = 5;
-      
+      // AABB collision
       return (
-        dinoRight - tolerance > obstacleLeft &&
-        dinoLeft + tolerance < obstacleRight &&
-        dinoBottom - tolerance > obstacleTop &&
-        dinoTop + tolerance < obstacleBottom
+        dinoX < cactusX + cactusWidth &&
+        dinoX + dinoWidth > cactusX &&
+        dinoY_adjusted < cactusY + cactusHeight &&
+        dinoY_adjusted + dinoHeight > cactusY
       );
     };
 
@@ -186,8 +186,15 @@ export default function DinoGame({ autoStart = false, onReady = () => {} }) {
         }
 
       } else {
-        // Draw static dino
+        // Draw static dino and frozen obstacles when not running
         drawDino(50, 150, false);
+        
+        // Draw existing obstacles in their frozen positions
+        obstacles.forEach(obstacle => {
+          if (obstacle.x > -30) {
+            drawCactus(obstacle.x, obstacle.y);
+          }
+        });
       }
 
       // Draw score
