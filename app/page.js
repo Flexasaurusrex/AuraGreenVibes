@@ -12,29 +12,12 @@ export default function Portfolio() {
   const [openWindows, setOpenWindows] = useState([]);
   const [dinoJump, setDinoJump] = useState(false);
 
-  // Loading animation
+  // Show Enter button after a delay
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          return 100;
-        }
-        return prev + 2;
-      });
-    }, 50);
-    return () => clearInterval(timer);
+    setTimeout(() => {
+      setShowEnter(true);
+    }, 2000); // Button appears after 2 seconds
   }, []);
-
-  // Show Enter button after loading completes
-  useEffect(() => {
-    if (progress >= 100) {
-      setTimeout(() => {
-        setShowEnter(true);
-        setLoading(false);
-      }, 500);
-    }
-  }, [progress]);
 
   // Dino jump animation
   useEffect(() => {
