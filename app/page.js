@@ -11,6 +11,9 @@ export default function Portfolio() {
   const [iconPositions, setIconPositions] = useState({});
   const [draggingIcon, setDraggingIcon] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [hasDragged, setHasDragged] = useState(false);
+  const [lastClickTime, setLastClickTime] = useState(0);
+  const [lastClickedIcon, setLastClickedIcon] = useState(null);
 
   const handleGameReady = useCallback(() => {
     setTimeout(() => setShowEnter(true), 2000);
@@ -93,7 +96,7 @@ export default function Portfolio() {
       description: 'About AuraGreen Coding',
       tech: '',
       isTerminal: true,
-      position: { x: 300, y: 150 },
+      position: { x: 900, y: 100 },
       content: `> INITIALIZING AURAGREEN_CODING...
 > LOADING PROFILE...
 > █████████████████████ 100%
@@ -230,14 +233,10 @@ Built with: Next.js + Canvas`
   };
 
   const handleIconMouseDown = (e, icon) => {
-    if (icon.isTerminal && openWindows.find(w => w.id === icon.id)) {
-      // Don't drag if terminal is already open
-      return;
-    }
-    
     e.preventDefault();
     const pos = iconPositions[icon.id] || icon.position;
     setDraggingIcon(icon.id);
+    setHasDragged(false);
     setDragOffset({
       x: e.clientX - pos.x,
       y: e.clientY - pos.y
@@ -246,6 +245,7 @@ Built with: Next.js + Canvas`
 
   const handleMouseMove = (e) => {
     if (draggingIcon) {
+      setHasDragged(true);
       setIconPositions(prev => ({
         ...prev,
         [draggingIcon]: {
@@ -258,6 +258,26 @@ Built with: Next.js + Canvas`
 
   const handleMouseUp = () => {
     setDraggingIcon(null);
+  };
+
+  const handleIconClick = (e, icon) => {
+    // Don't open if user was dragging
+    if (hasDragged) {
+      return;
+    }
+
+    // Double-click detection (300ms window)
+    const now = Date.now();
+    if (lastClickedIcon === icon.id && now - lastClickTime < 300) {
+      // Double click!
+      openWindow(icon);
+      setLastClickTime(0);
+      setLastClickedIcon(null);
+    } else {
+      // First click
+      setLastClickTime(now);
+      setLastClickedIcon(icon.id);
+    }
   };
 
   if (loading && !entered) {
@@ -351,11 +371,7 @@ Built with: Next.js + Canvas`
       style={{
         width: '100vw',
         height: '100vh',
-        background: `
-          linear-gradient(180deg, #F5F5DC 0%, #E8E8D0 100%),
-          repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 195, 74, 0.03) 2px, rgba(139, 195, 74, 0.03) 4px)
-        `,
-        backgroundBlendMode: 'multiply',
+        background: 'linear-gradient(180deg, #F5F5DC 0%, #E8E8D0 100%)',
         position: 'relative',
         overflow: 'hidden',
         fontFamily: '"Press Start 2P", monospace',
@@ -399,7 +415,7 @@ Built with: Next.js + Canvas`
           <div
             key={project.id}
             onMouseDown={(e) => handleIconMouseDown(e, project)}
-            onClick={() => !draggingIcon && openWindow(project)}
+            onClick={(e) => handleIconClick(e, project)}
             style={{
               position: 'absolute',
               left: `${pos.x}px`,
@@ -450,8 +466,8 @@ Built with: Next.js + Canvas`
           position: 'absolute',
           left: `${window.windowX}px`,
           top: `${window.windowY}px`,
-          width: window.isTerminal ? '600px' : '500px',
-          minHeight: window.isTerminal ? '400px' : '300px',
+          width: window.isTerminal ? '450px' : '500px',
+          minHeight: window.isTerminal ? '300px' : '300px',
           background: '#FFFFFF',
           border: '3px solid #558B2F',
           boxShadow: '8px 8px 0 rgba(0,0,0,0.3)',
@@ -498,7 +514,7 @@ Built with: Next.js + Canvas`
             fontSize: '10px',
             lineHeight: '18px',
             fontFamily: '"Courier New", monospace',
-            minHeight: window.isTerminal ? '350px' : '250px',
+            minHeight: window.isTerminal ? '250px' : '250px',
             maxHeight: '500px',
             overflowY: 'auto',
             display: 'flex',
