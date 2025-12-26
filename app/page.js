@@ -111,6 +111,16 @@ export default function Portfolio() {
       isMainProject: true
     },
     {
+      id: 'numbermunchers',
+      title: 'Number Munchers',
+      icon: '🔢',
+      description: 'Classic 90s math education game - dodge Troggles!',
+      tech: 'React • Retro Gaming • Educational',
+      isNumberMunchers: true,
+      position: { x: 160, y: 60 },
+      isMainProject: false
+    },
+    {
       id: 'terminal',
       title: 'README.txt',
       icon: '📄',
@@ -303,7 +313,8 @@ Built with: Next.js + Canvas`
       if (isOverTrash) {
         // Get the project being trashed
         const project = projects.find(p => p.id === draggingIcon);
-        if (project && !project.isSystem && draggingIcon !== 'trash') {
+        // Can't trash: system items, trash itself, or items already in trash
+        if (project && !project.isSystem && !project.isTrash && draggingIcon !== 'trash') {
           // Add to trash
           setTrashedItems([...trashedItems, project]);
           // Play sound
@@ -509,6 +520,8 @@ Built with: Next.js + Canvas`
             <div style={{ fontSize: '40px', textShadow: '2px 2px 4px rgba(0,0,0,0.3)', pointerEvents: 'none' }}>
               {project.icon === '🦖' ? (
                 <img src="/Dino.png" alt="Dino" style={{ width: '40px', height: '42px', imageRendering: 'pixelated' }} />
+              ) : project.icon === '🔢' ? (
+                <img src="/muncher.png" alt="Muncher" style={{ width: '40px', height: '40px', imageRendering: 'pixelated' }} />
               ) : (
                 project.icon
               )}
@@ -533,8 +546,8 @@ Built with: Next.js + Canvas`
           position: 'absolute',
           left: `${window.windowX}px`,
           top: `${window.windowY}px`,
-          width: window.isTerminal ? '450px' : '500px',
-          minHeight: window.isTerminal ? '300px' : '300px',
+          width: window.isTerminal ? '450px' : window.isNumberMunchers ? '600px' : '500px',
+          minHeight: window.isTerminal ? '300px' : window.isNumberMunchers ? '500px' : '300px',
           background: '#FFFFFF',
           border: '3px solid #558B2F',
           boxShadow: '8px 8px 0 rgba(0,0,0,0.3)',
@@ -591,6 +604,17 @@ Built with: Next.js + Canvas`
           }}>
             {window.isGame ? (
               <DinoGame autoStart={false} />
+            ) : window.isNumberMunchers ? (
+              <iframe 
+                src="https://msaperst.github.io/number-munchers/"
+                style={{
+                  width: '100%',
+                  height: '450px',
+                  border: 'none',
+                  background: '#000'
+                }}
+                title="Number Munchers Game"
+              />
             ) : window.isTrashWindow ? (
               <div style={{ width: '100%' }}>
                 <div style={{ marginBottom: '20px', color: '#8BC34A' }}>
