@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback } from 'react';
 import DinoGame from './DinoGame';
 
 export default function Portfolio() {
@@ -11,6 +10,10 @@ export default function Portfolio() {
   const [entered, setEntered] = useState(false);
   const [openWindows, setOpenWindows] = useState([]);
   const [dinoJump, setDinoJump] = useState(false);
+
+  const handleGameReady = useCallback(() => {
+    setTimeout(() => setShowEnter(true), 2000);
+  }, []);
 
   // Show Enter button after a delay
   useEffect(() => {
@@ -161,9 +164,7 @@ Let's build. 🦖`
         </div>
 
         {/* Playable Dino Game */}
-        <DinoGame autoStart={true} onReady={() => {
-          setTimeout(() => setShowEnter(true), 2000);
-        }} />
+        <DinoGame autoStart={true} onReady={handleGameReady} />
 
         {/* Instructions */}
         <div style={{
@@ -178,46 +179,43 @@ Let's build. 🦖`
         </div>
 
         {/* Enter button */}
-        <AnimatePresence>
-          {showEnter && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setEntered(true)}
-              style={{
-                marginTop: '40px',
-                padding: '15px 40px',
-                fontSize: '16px',
-                background: '#8BC34A',
-                border: '3px solid #558B2F',
-                color: '#1A1A1A',
-                cursor: 'pointer',
-                fontFamily: '"Press Start 2P", monospace',
-                boxShadow: '0 4px 0 #558B2F, 0 0 20px rgba(139, 195, 74, 0.5)',
-                transition: 'all 0.1s',
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.transform = 'translateY(4px)';
-                e.currentTarget.style.boxShadow = '0 0 0 #558B2F, 0 0 20px rgba(139, 195, 74, 0.5)';
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 0 #558B2F, 0 0 20px rgba(139, 195, 74, 0.5)';
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#9CCC65';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#8BC34A';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 0 #558B2F, 0 0 20px rgba(139, 195, 74, 0.5)';
-              }}
-            >
-              ENTER
-            </motion.button>
-          )}
-        </AnimatePresence>
+        {showEnter && (
+          <button
+            onClick={() => setEntered(true)}
+            style={{
+              marginTop: '40px',
+              padding: '15px 40px',
+              fontSize: '16px',
+              background: '#8BC34A',
+              border: '3px solid #558B2F',
+              color: '#1A1A1A',
+              cursor: 'pointer',
+              fontFamily: '"Press Start 2P", monospace',
+              boxShadow: '0 4px 0 #558B2F, 0 0 20px rgba(139, 195, 74, 0.5)',
+              transition: 'all 0.1s',
+              opacity: 1,
+              animation: 'fadeIn 0.3s ease-in'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+              e.currentTarget.style.boxShadow = '0 0 0 #558B2F, 0 0 20px rgba(139, 195, 74, 0.5)';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 0 #558B2F, 0 0 20px rgba(139, 195, 74, 0.5)';
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#9CCC65';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#8BC34A';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 0 #558B2F, 0 0 20px rgba(139, 195, 74, 0.5)';
+            }}
+          >
+            ENTER
+          </button>
+        )}
 
         {/* Signature */}
         <div style={{
