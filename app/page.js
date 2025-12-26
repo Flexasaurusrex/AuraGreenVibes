@@ -604,8 +604,8 @@ Built with: Next.js + Canvas`
           position: 'absolute',
           left: `${window.windowX}px`,
           top: `${window.windowY}px`,
-          width: window.isTerminal ? '450px' : (window.isNumberMunchers || window.isOregonTrail) ? '600px' : '500px',
-          minHeight: window.isTerminal ? '300px' : (window.isNumberMunchers || window.isOregonTrail) ? '500px' : '300px',
+          width: window.isTerminal ? '450px' : (window.isNumberMunchers || window.isOregonTrail) ? '800px' : '500px',
+          minHeight: window.isTerminal ? '300px' : (window.isNumberMunchers || window.isOregonTrail) ? '600px' : '300px',
           background: '#FFFFFF',
           border: '3px solid #558B2F',
           boxShadow: '8px 8px 0 rgba(0,0,0,0.3)',
@@ -708,7 +708,7 @@ Built with: Next.js + Canvas`
                 src="https://msaperst.github.io/number-munchers/"
                 style={{
                   width: '100%',
-                  height: '450px',
+                  height: '550px',
                   border: 'none',
                   background: '#000'
                 }}
@@ -719,7 +719,7 @@ Built with: Next.js + Canvas`
                 src="https://warnock.github.io/oregon-trail-game/"
                 style={{
                   width: '100%',
-                  height: '450px',
+                  height: '550px',
                   border: 'none',
                   background: '#000'
                 }}
