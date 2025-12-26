@@ -24,7 +24,7 @@ export default function Portfolio() {
     if (entered && openWindows.length === 0) {
       setTimeout(() => {
         openWindow(projects.find(p => p.id === 'terminal'));
-      }, 500);
+      }, 1500); // Increased delay to let everything load
     }
   }, [entered]);
 
@@ -142,7 +142,7 @@ Available for contract work.
     {
       id: 'about',
       title: 'About Me',
-      icon: '🦖',
+      icon: '👤',
       description: 'The builder behind AuraGreen',
       tech: '',
       position: { x: 40, y: 700 },
@@ -168,7 +168,7 @@ Available for contract work.`
       icon: '📬',
       description: 'Let\'s build something',
       tech: '',
-      position: { x: 160, y: 700 },
+      position: { x: 900, y: 450 },
       content: `> CONTACT_
 
 GitHub: github.com/yourusername
@@ -220,10 +220,14 @@ Built with: Next.js + Canvas`
   const openWindow = (project) => {
     if (!project) return;
     if (!openWindows.find(w => w.id === project.id)) {
+      // Center terminal window, random position for others
+      const windowX = project.isTerminal ? (window.innerWidth - 450) / 2 : Math.random() * 200 + 100;
+      const windowY = project.isTerminal ? (window.innerHeight - 350) / 2 : Math.random() * 100 + 100;
+      
       setOpenWindows([...openWindows, { 
         ...project, 
-        windowX: Math.random() * 200 + 100, 
-        windowY: Math.random() * 100 + 100 
+        windowX, 
+        windowY 
       }]);
     }
   };
