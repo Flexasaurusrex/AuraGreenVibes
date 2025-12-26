@@ -541,8 +541,15 @@ Built with: Next.js + Canvas`
       })}
 
       {/* Windows */}
-      {openWindows.map((window, index) => (
-        <div key={window.id} style={{
+      {openWindows.map((window, index) => {
+        // For trash window, update content dynamically
+        const displayWindow = window.isTrashWindow ? {
+          ...window,
+          trashedItemsCount: trashedItems.length
+        } : window;
+        
+        return (
+        <div key={window.id + (window.isTrashWindow ? `-${trashedItems.length}` : '')} style={{
           position: 'absolute',
           left: `${window.windowX}px`,
           top: `${window.windowY}px`,
@@ -617,8 +624,24 @@ Built with: Next.js + Canvas`
               />
             ) : window.isTrashWindow ? (
               <div style={{ width: '100%' }}>
-                <div style={{ marginBottom: '20px', color: '#8BC34A' }}>
-                  &gt; TRASH_
+                <div style={{ marginBottom: '20px', color: '#8BC34A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>&gt; TRASH_</span>
+                  {trashedItems.length > 0 && (
+                    <button
+                      onClick={() => setTrashedItems([])}
+                      style={{
+                        padding: '8px 12px',
+                        background: '#FF5252',
+                        color: '#FFF',
+                        border: '2px solid #C62828',
+                        cursor: 'pointer',
+                        fontSize: '8px',
+                        fontFamily: '"Press Start 2P", monospace'
+                      }}
+                    >
+                      EMPTY TRASH
+                    </button>
+                  )}
                 </div>
                 {trashedItems.length === 0 ? (
                   <div style={{ color: '#558B2F', fontStyle: 'italic' }}>
@@ -726,7 +749,8 @@ Built with: Next.js + Canvas`
             )}
           </div>
         </div>
-      ))}
+        );
+      })}
 
       {/* Bottom Dock */}
       <div style={{
