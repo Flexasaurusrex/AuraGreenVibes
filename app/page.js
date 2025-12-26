@@ -14,6 +14,27 @@ export default function Portfolio() {
   const [hasDragged, setHasDragged] = useState(false);
   const [lastClickTime, setLastClickTime] = useState(0);
   const [lastClickedIcon, setLastClickedIcon] = useState(null);
+  const [trashedItems, setTrashedItems] = useState([]);
+  const [isTrashHovered, setIsTrashHovered] = useState(false);
+
+  // Trash sound effect
+  const playTrashSound = () => {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 100;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+  };
 
   const handleGameReady = useCallback(() => {
     setTimeout(() => setShowEnter(true), 2000);
@@ -186,19 +207,6 @@ Project-based available
 Let's build. 🦖`
     },
     {
-      id: 'trash',
-      title: 'Trash',
-      icon: '🗑️',
-      description: 'Recycle Bin',
-      isSystem: true,
-      position: { x: 1200, y: 600 },
-      content: `> TRASH_
-
-Empty
-
-No items in trash.`
-    },
-    {
       id: 'settings',
       title: 'Settings',
       icon: '⚙️',
@@ -257,11 +265,33 @@ Built with: Next.js + Canvas`
           y: e.clientY - dragOffset.y
         }
       }));
+      
+      // Check if hovering over trash
+      const isOverTrash = e.clientY > window.innerHeight - 60 && e.clientX > window.innerWidth - 150;
+      setIsTrashHovered(isOverTrash);
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
+    if (draggingIcon && hasDragged) {
+      // Check if dropped on trash (dock is 60px high, trash is on right side)
+      const isOverTrash = e.clientY > window.innerHeight - 60 && e.clientX > window.innerWidth - 150;
+      
+      if (isOverTrash) {
+        // Get the project being trashed
+        const project = projects.find(p => p.id === draggingIcon);
+        if (project && !project.isSystem) {
+          // Add to trash
+          setTrashedItems([...trashedItems, project]);
+          // Play sound
+          playTrashSound();
+          // Close window if open
+          closeWindow(draggingIcon);
+        }
+      }
+    }
     setDraggingIcon(null);
+    setIsTrashHovered(false);
   };
 
   const handleIconClick = (e, icon) => {
@@ -282,6 +312,10 @@ Built with: Next.js + Canvas`
       setLastClickTime(now);
       setLastClickedIcon(icon.id);
     }
+  };
+
+  const restoreFromTrash = (item) => {
+    setTrashedItems(trashedItems.filter(i => i.id !== item.id));
   };
 
   if (loading && !entered) {
@@ -413,7 +447,7 @@ Built with: Next.js + Canvas`
       </div>
 
       {/* Desktop icons */}
-      {projects.map(project => {
+      {projects.filter(p => !trashedItems.find(t => t.id === p.id)).map(project => {
         const pos = iconPositions[project.id] || project.position;
         return (
           <div
@@ -528,6 +562,60 @@ Built with: Next.js + Canvas`
           }}>
             {window.isGame ? (
               <DinoGame autoStart={false} />
+            ) : window.isTrashWindow ? (
+              <div style={{ width: '100%' }}>
+                <div style={{ marginBottom: '20px', color: '#8BC34A' }}>
+                  &gt; TRASH_
+                </div>
+                {trashedItems.length === 0 ? (
+                  <div style={{ color: '#558B2F', fontStyle: 'italic' }}>
+                    Empty<br/><br/>
+                    Drag icons to the trash can in the dock to delete them.
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ marginBottom: '15px', color: '#FFFFFF' }}>
+                      {trashedItems.length} item{trashedItems.length > 1 ? 's' : ''} in trash
+                    </div>
+                    {trashedItems.map(item => (
+                      <div
+                        key={item.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '10px',
+                          marginBottom: '8px',
+                          background: 'rgba(139, 195, 74, 0.1)',
+                          border: '1px solid #558B2F',
+                          cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139, 195, 74, 0.2)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(139, 195, 74, 0.1)'}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ fontSize: '20px' }}>{item.icon}</span>
+                          <span>{item.title}</span>
+                        </div>
+                        <button
+                          onClick={() => restoreFromTrash(item)}
+                          style={{
+                            padding: '5px 10px',
+                            background: '#8BC34A',
+                            color: '#1A1A1A',
+                            border: '2px solid #558B2F',
+                            cursor: 'pointer',
+                            fontSize: '8px',
+                            fontFamily: '"Press Start 2P", monospace'
+                          }}
+                        >
+                          RESTORE
+                        </button>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
             ) : window.content || window.isTerminal ? (
               <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#8BC34A' }}>{window.content}</pre>
             ) : (
@@ -635,10 +723,63 @@ Built with: Next.js + Canvas`
         
         <div style={{ flex: 1 }} />
         
+        {/* Trash Can */}
+        <div
+          onClick={() => openWindow({ 
+            id: 'trash-window',
+            title: 'Trash',
+            icon: '🗑️',
+            isTrashWindow: true
+          })}
+          style={{
+            width: '50px',
+            height: '50px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '35px',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            borderRadius: '8px',
+            background: isTrashHovered ? 'rgba(255, 82, 82, 0.3)' : trashedItems.length > 0 ? 'rgba(139, 195, 74, 0.2)' : 'transparent',
+            border: isTrashHovered ? '2px dashed #FF5252' : '2px solid transparent'
+          }}
+          onMouseEnter={(e) => {
+            if (!draggingIcon) {
+              e.currentTarget.style.transform = 'translateY(-5px) scale(1.1)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+          }}
+        >
+          🗑️
+          {trashedItems.length > 0 && (
+            <div style={{
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              background: '#FF5252',
+              color: '#FFF',
+              borderRadius: '50%',
+              width: '18px',
+              height: '18px',
+              fontSize: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold'
+            }}>
+              {trashedItems.length}
+            </div>
+          )}
+        </div>
+        
         <div style={{
           fontSize: '10px',
           color: '#8BC34A',
-          letterSpacing: '2px'
+          letterSpacing: '2px',
+          marginLeft: '15px'
         }}>
           {new Date().toLocaleTimeString()}
         </div>
