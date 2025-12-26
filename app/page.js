@@ -344,7 +344,12 @@ Built with: Next.js + Canvas`
         // Can't trash: system items, trash itself, or items already in trash
         if (project && !project.isSystem && !project.isTrash && draggingIcon !== 'trash') {
           // Add to trash
-          setTrashedItems([...trashedItems, project]);
+          console.log('Adding to trash:', project.title);
+          setTrashedItems(prev => {
+            const newTrash = [...prev, project];
+            console.log('Trashed items now:', newTrash.length);
+            return newTrash;
+          });
           // Play sound
           playTrashSound();
           // Close window if open
@@ -480,6 +485,14 @@ Built with: Next.js + Canvas`
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
+      <style>{`
+        * {
+          cursor: default !important;
+        }
+        button {
+          cursor: default !important;
+        }
+      `}</style>
       {/* Menu bar */}
       <div style={{
         height: '30px',
